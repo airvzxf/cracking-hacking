@@ -91,7 +91,10 @@ def read_write_heap(pid, enable='enable'):
 				break
 
 		mem_file.seek(memory_start + memory_offset)
-		mem_file.write(opcode_new)
+		if is_set_enable:
+			mem_file.write(opcode_new)
+		else:
+			mem_file.write(opcode_base)
 
 		mem_file.seek(memory_start + memory_offset)
 		data = mem_file.read(opcode_bytes)
