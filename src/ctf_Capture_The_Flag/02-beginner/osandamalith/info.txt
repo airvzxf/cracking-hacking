@@ -1,0 +1,133 @@
+Linux Reverse Engineering CTFs for Beginners
+https://osandamalith.com/2019/02/11/linux-reverse-engineering-ctfs-for-beginners/
+
+
+APP:
+nix_5744af788e6cbdb29bb41e8b0e5f3cd5
+
+
+info functions
+	0x000011e9  main
+	0x000012d9  comp_key
+
+
+info target
+	0x000010b0 - 0x00001462 is .text
+	0x00002000 - 0x00002097 is .rodata
+	0x00004024 - 0x0000402c is .data
+	0x0000402c - 0x00004040 is .bss
+
+
+info sym 0x00002000
+	_fp_hw in section .rodata
+
+
+x/11s 0x00002000
+	0x2000 <_fp_hw>:        "\003"
+	0x2002 <_fp_hw+2>:      ""
+	0x2003 <_fp_hw+3>:      ""
+	0x2004 <_IO_stdin_used>:        "\001"
+	0x2006 <_IO_stdin_used+2>:      "\002"
+	0x2008: "Usage: script.exe <key>"
+	0x2020: "Length of argv[1] too long."
+	0x203c: "[+] The flag is: SAYCURE{%s} [+]\n"
+	0x205e: "\n[+] No flag for you. [+]"
+	0x2078: "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c"
+	0x2097: <error: Cannot access memory at address 0x2097>
+
+
+0x205e: "\n[+] No flag for you. [+]"
+
+watch *0x205e
+info watchpoints
+
+
+# -----------------------------------------------------
+# -----------------------------------------------------
+
+break main
+
+run aaa
+
+info functions ^main
+	0x565561e9  main
+info functions ^comp_key
+	0x565562d9  comp_key
+
+
+info target
+	0x565560b0 - 0x56556462 is .text
+	0x56557000 - 0x56557097 is .rodata
+	0x56559024 - 0x5655902c is .data
+	0x5655902c - 0x56559040 is .bss
+
+
+info sym 0x56557000
+	_fp_hw in section .rodata of nix_5744af788e6cbdb29bb41e8b0e5f3cd5
+
+
+x/11s 0x56557000
+	0x56557000 <_fp_hw>:    "\003"
+	0x56557002 <_fp_hw+2>:  ""
+	0x56557003 <_fp_hw+3>:  ""
+	0x56557004 <_IO_stdin_used>:    "\001"
+	0x56557006 <_IO_stdin_used+2>:  "\002"
+	0x56557008:     "Usage: script.exe <key>"
+	0x56557020:     "Length of argv[1] too long."
+	0x5655703c:     "[+] The flag is: SAYCURE{%s} [+]\n"
+	0x5655705e:     "\n[+] No flag for you. [+]"
+	0x56557078:     "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c"
+	0x56557097:     ""
+
+
+0x5655705e:     "\n[+] No flag for you. [+]"
+
+watch *0x5655705e
+info watchpoints
+
+
+info threads
+	  Id   Target Id                        Frame 
+	* 1    process 314855 "nix_5744af788e6" 0x565561f9 in main ()
+
+
+info inferior
+	  Num  Description       Connection           Executable        
+	* 1    process 314855    3 (native)           nix_5744af788e6cbdb29bb41e8b0e5f3cd5 
+
+
+
+
+# -----------------------------------------------------
+# Reverse Debugging
+# -----------------------------------------------------
+
+
+Start:
+   0x565561e9 <+0>:     lea    0x4(%esp),%ecx
+Finish:
+   0x565562d8 <+239>:   ret    
+
+
+start
+break main
+break *0x565562d8
+i b
+commands 2
+ record 
+ continue 
+ end
+commands 3
+ end
+run
+
+
+# -----------------------------------------------------
+# Solution
+# -----------------------------------------------------
+
+It sums the ASCII value for every character from 1 to 7, the sum should be 801.
+
+Correct values:
+- zzzzzzE
+- rrrrrru

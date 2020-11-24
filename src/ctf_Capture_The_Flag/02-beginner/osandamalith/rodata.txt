@@ -1,0 +1,8 @@
+
+String dump of section '.rodata':
+  [     8]  Usage: script.exe <key>
+  [    20]  Length of argv[1] too long.
+  [    3c]  [+] The flag is: SAYCURE{%s} [+]\n
+  [    5f]  [+] No flag for you. [+]
+  [    78]  %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c
+
